@@ -1,6 +1,7 @@
 package com.lathief.catatan.controller;
 
 import com.lathief.catatan.model.entities.note.Note;
+import com.lathief.catatan.model.payload.request.ShareNoteRequest;
 import com.lathief.catatan.service.interfaces.UserNoteService;
 import com.lathief.catatan.utils.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,9 @@ public class UserNoteController {
     @Autowired
     Response response;
     @PostMapping("/{noteid}/share")
-    public ResponseEntity<?> updateNote(@PathVariable Long noteid, @RequestBody Map<String, String> shareIds){
+    public ResponseEntity<?> updateNote(@PathVariable Long noteid, @RequestBody ShareNoteRequest shareIds){
         Map result = new HashMap<>();
-        for (Map.Entry<String,String> entry : shareIds.entrySet()) {
+        for (Map.Entry<String,String> entry : shareIds.getShareIds().entrySet()) {
             result = userNoteService.shareNote(noteid, Long.parseLong(entry.getKey()), entry.getValue());
         }
 

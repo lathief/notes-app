@@ -8,6 +8,7 @@ import com.lathief.catatan.model.entities.user.User;
 import com.lathief.catatan.model.enums.EPermission;
 import com.lathief.catatan.model.enums.ERole;
 import com.lathief.catatan.repository.UserNoteRepository;
+import com.lathief.catatan.repository.note.LabelRepository;
 import com.lathief.catatan.repository.note.NoteRepository;
 import com.lathief.catatan.service.interfaces.NoteService;
 import com.lathief.catatan.service.provider.UserRelatedServiceImpl;
@@ -17,15 +18,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class NoteServiceImpl extends UserRelatedServiceImpl implements NoteService{
     @Autowired
     NoteRepository noteRepository;
+    @Autowired
+    LabelRepository labelRepository;
     @Autowired
     UserNoteRepository userNoteRepository;
     @Autowired
@@ -53,8 +53,10 @@ public class NoteServiceImpl extends UserRelatedServiceImpl implements NoteServi
     }
 
     public Map insertNote(Note note) {
-        Label label = new Label("unlabeled");
-        note.setLabel(label);
+        Label label = labelRepository.findOneByName("unlabeled");
+        Set<Label> labels = new HashSet<>();
+        labels.add(label);
+        note.setLabels(labels);
         UserNoteKey key = new UserNoteKey();
         key.setNoteId(note.getId());
         key.setUserId(getUserByUsername().getId());

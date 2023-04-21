@@ -30,16 +30,18 @@ public class UserNoteServiceImpl extends UserRelatedServiceImpl implements UserN
     @Autowired
     UserNoteRepository userNoteRepository;
     public Map shareNote(Long noteid, Long shareuserid, String permission) {
+        System.out.println("share note" + noteid + " " + shareuserid + " permission:" + permission);
         User owner = getUserByUsername();
-        if (!noteRepository.existsById(noteid)) {
+        if (!noteRepository.findById(noteid).isPresent()) {
             return response.custom("Note tidak di temukan", HttpStatus.NOT_FOUND);
         }
-        if (!userRepository.existsById(shareuserid)) {
+        if (!userRepository.findById(shareuserid).isPresent()) {
             return response.custom("User tidak di temukan", HttpStatus.NOT_FOUND);
         }
         List<UserNote> userNotes = userNoteRepository.findOneUserById(owner.getId());
         for (UserNote unote : userNotes) {
             if (unote.getNote().getId().equals(noteid)) {
+                System.out.println(unote.getNote().getId() + " " + noteid);
                 if (unote.getPermission().equals(EPermission.OWNER) && unote.getUser().getId().equals(getUserByUsername().getId())){
                     UserNoteKey key = new UserNoteKey();
                     key.setNoteId(noteid);

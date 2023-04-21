@@ -1,7 +1,9 @@
 package com.lathief.catatan;
 
+import com.lathief.catatan.model.entities.note.Label;
 import com.lathief.catatan.model.entities.user.Role;
 import com.lathief.catatan.model.enums.ERole;
+import com.lathief.catatan.repository.note.LabelRepository;
 import com.lathief.catatan.repository.user.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -16,7 +18,8 @@ import java.util.List;
 public class CatatanApplication implements ApplicationRunner {
 	@Autowired
 	RoleRepository roleRepository;
-
+	@Autowired
+	LabelRepository labelRepository;
 	public static void main(String[] args) {
 		SpringApplication.run(CatatanApplication.class, args);
 	}
@@ -29,6 +32,10 @@ public class CatatanApplication implements ApplicationRunner {
 			if (roleRepository.findOneRoleByName(String.valueOf(r.getName())) == null) {
 				roleRepository.save(r);
 			}
+		}
+		if (labelRepository.findOneByName("unlabeled") == null) {
+			Label unlabel = new Label("unlabeled");
+			labelRepository.save(unlabel);
 		}
 	}
 }

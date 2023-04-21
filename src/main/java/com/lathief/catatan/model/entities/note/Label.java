@@ -17,6 +17,9 @@ public class Label extends DateAudit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+//    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
+//    @JoinColumn(name = "notes_id", nullable = false)
+//    private Note note;
     public Label(String name) {
         this.name = name;
     }
