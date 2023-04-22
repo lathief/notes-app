@@ -9,6 +9,8 @@ import com.lathief.catatan.model.payload.response.JWTResponse;
 import com.lathief.catatan.service.interfaces.AuthService;
 import com.lathief.catatan.utils.Response;
 import com.lathief.catatan.utils.jwt.JwtUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +25,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @RestController
+@Tag(name = "User Management", description = "APIs for Managing User")
 @RequestMapping("/v1/auth")
 public class AuthController {
     @Autowired
@@ -35,6 +38,7 @@ public class AuthController {
     Response response;
     @Autowired
     PasswordEncoder encoder;
+    @Operation(summary = "User Login with username/email and password", tags = {"User Management"})
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody SigninRequest signinRequest) {
         User getUser = authService.getUserByUsername(signinRequest.getUsername());
@@ -51,6 +55,7 @@ public class AuthController {
         User userDetails = (User) authentication.getPrincipal();
         return ResponseEntity.ok(new JWTResponse(accessToken));
     }
+    @Operation(summary = "Register User with username, email and password", tags = {"User Management"})
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
         if (authService.checkExistUserByUsername(signupRequest.getUsername()) != null){

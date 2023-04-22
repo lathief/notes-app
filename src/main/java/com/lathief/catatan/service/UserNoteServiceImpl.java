@@ -29,13 +29,13 @@ public class UserNoteServiceImpl extends UserRelatedServiceImpl implements UserN
     NoteRepository noteRepository;
     @Autowired
     UserNoteRepository userNoteRepository;
-    public Map shareNote(Long noteid, Long shareuserid, String permission) {
-        System.out.println("share note" + noteid + " " + shareuserid + " permission:" + permission);
+    public Map shareNote(Long noteid, String email, String permission) {
         User owner = getUserByUsername();
         if (!noteRepository.findById(noteid).isPresent()) {
             return response.custom("Note tidak di temukan", HttpStatus.NOT_FOUND);
         }
-        if (!userRepository.findById(shareuserid).isPresent()) {
+        User getUser = userRepository.findOneByEmail(email);
+        if (getUser == null) {
             return response.custom("User tidak di temukan", HttpStatus.NOT_FOUND);
         }
         List<UserNote> userNotes = userNoteRepository.findOneUserById(owner.getId());
@@ -45,8 +45,8 @@ public class UserNoteServiceImpl extends UserRelatedServiceImpl implements UserN
                 if (unote.getPermission().equals(EPermission.OWNER) && unote.getUser().getId().equals(getUserByUsername().getId())){
                     UserNoteKey key = new UserNoteKey();
                     key.setNoteId(noteid);
-                    key.setUserId(shareuserid);
-                    UserNote userNote = new UserNote(noteRepository.findOneById(noteid), userRepository.findOneById(shareuserid), EPermission.valueOf(permission));
+                    key.setUserId(getUser.getId());
+                    UserNote userNote = new UserNote(noteRepository.findOneById(noteid), getUser, EPermission.valueOf(permission));
                     userNoteRepository.save(userNote);
                     return response.custom("Note di share", HttpStatus.OK);
                 } else {

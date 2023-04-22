@@ -6,5 +6,5 @@ import java.util.Map;
 
 @Service
 public interface UserNoteService {
-    Map shareNote(Long noteid, Long shareuserid, String permission);
+    Map shareNote(Long noteid, String email, String permission);
 }

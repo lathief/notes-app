@@ -51,8 +51,10 @@ public class SecurityConfig {
         http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeHttpRequests().antMatchers("/v1/label/**").authenticated()
+                .authorizeHttpRequests()
+                .antMatchers("/swagger/**","/swagger-ui/**","/swagger-ui.html", "/v3/api-docs/**").permitAll()
                 .antMatchers("/v1/notes/**").authenticated()
+                .antMatchers("/v1/label/**").authenticated()
                 .antMatchers("/v1/auth/**").permitAll()
                 .anyRequest().authenticated();
 
