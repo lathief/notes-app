@@ -38,7 +38,7 @@ public class AuthController {
     Response response;
     @Autowired
     PasswordEncoder encoder;
-    @Operation(summary = "User Login with username/email and password", tags = {"User Management"})
+    @Operation(summary = "Login User with username/email and password", tags = {"User Management"})
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody SigninRequest signinRequest) {
         User getUser = authService.getUserByUsername(signinRequest.getUsername());

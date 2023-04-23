@@ -28,7 +28,7 @@ public class User extends DateAudit implements UserDetails {
     private String username;
     private String email;
     private String password;
-    @ManyToMany(targetEntity = Role.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(targetEntity = Role.class, cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role",
             joinColumns = {

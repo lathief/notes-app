@@ -9,4 +9,5 @@ import java.util.Map;
 @Service
 public interface NoteLabelService {
     Map addLabel(Long noteid, List<String> labels);
+    Map getLabel(Long noteid);
 }

@@ -38,14 +38,13 @@ public class DatabaseSeeder implements ApplicationRunner {
                 roleRepository.save(r);
             }
         }
-        if (labelRepository.findOneByName("unlabeled") == null) {
-            Label unlabel = new Label("unlabeled");
-            labelRepository.save(unlabel);
-        }
         if (userRepository.findOneByUsername("admin") == null) {
-            User admin = new User("admin", "admin@admin.com", encoder.encode("admin1234"));
-            admin.setRoles(roles);
-            userRepository.save(admin);
+            Set<Role> rolesAdmin = new HashSet<Role>();
+            Role admin = roleRepository.findOneRoleByName(String.valueOf(ERole.ROLE_ADMIN));
+            rolesAdmin.add(admin);
+            User adminUser = new User("admin", "admin@admin.com", encoder.encode("admin1234"));
+            adminUser.setRoles(rolesAdmin);
+            userRepository.save(adminUser);
         }
     }
 }

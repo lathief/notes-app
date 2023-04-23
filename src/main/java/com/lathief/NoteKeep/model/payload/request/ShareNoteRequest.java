@@ -8,6 +8,6 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 public class ShareNoteRequest {
-    private String useremail;
-    private String userrole;
+    private String email;
+    private String permission;
 }

@@ -15,7 +15,7 @@ public class SwaggerConfig {
     private int serverPort;
 
     @Bean
-    public OpenAPI userServiceApi(@Value("Swagger UI for Simplenote app") String appDescription,
+    public OpenAPI userServiceApi(@Value("Swagger UI for NoteKeep App") String appDescription,
                                   @Value("v1.0.0") String appVersion
     ) {
         Server server = new Server();
@@ -25,7 +25,7 @@ public class SwaggerConfig {
 
         return new OpenAPI()
                 .info(new Info()
-                        .title("Simplenote app")
+                        .title("NoteKeep App")
                         .version(appVersion)
                         .description(appDescription)
                         .termsOfService("https://github.com/lathief/notes-app")

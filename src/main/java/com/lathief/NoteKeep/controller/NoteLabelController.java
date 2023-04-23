@@ -1,9 +1,7 @@
 package com.lathief.NoteKeep. controller;
 
-import com.lathief.NoteKeep.model.payload.request.AddLabel;
-import com.lathief.NoteKeep.service.interfaces.LabelService;
+import com.lathief.NoteKeep.model.payload.request.inputLabel;
 import com.lathief.NoteKeep.service.interfaces.NoteLabelService;
-import com.lathief.NoteKeep.service.interfaces.NoteService;
 import com.lathief.NoteKeep.utils.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,17 +20,23 @@ public class NoteLabelController {
     @Autowired
     Response response;
     @Autowired
-    NoteService noteService;
-    @Autowired
-    LabelService labelService;
-
-    @Autowired
     NoteLabelService noteLabelService;
     @Operation(summary = "Add a label to note that the user owns", tags = {"Notes Management"})
     @PostMapping("/{noteid}/addLabel")
-    public ResponseEntity<?> updateNote(@PathVariable Long noteid, @RequestBody AddLabel labels) {
+    public ResponseEntity<?> addLabel(@PathVariable Long noteid, @RequestBody inputLabel insertlabels) {
         Map result = new HashMap<>();
-        result = noteLabelService.addLabel(noteid, labels.getLabels());
+        result = noteLabelService.addLabel(noteid, insertlabels.getLabels());
+        if (result != null) {
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(response.custom("Unauthorized", HttpStatus.NOT_FOUND), HttpStatus.NOT_FOUND);
+        }
+    }
+    @Operation(summary = "Get a label to note that the user owns", tags = {"Notes Management"})
+    @GetMapping("/{noteid}/getLabel")
+    public ResponseEntity<?> getLabel(@PathVariable Long noteid) {
+        Map result = new HashMap<>();
+        result = noteLabelService.getLabel(noteid);
         if (result != null) {
             return new ResponseEntity<>(result, HttpStatus.OK);
         } else {

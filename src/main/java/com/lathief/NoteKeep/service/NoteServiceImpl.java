@@ -1,19 +1,16 @@
 package com.lathief.NoteKeep.service;
 
 import com.lathief.NoteKeep.model.entities.UserNote;
-import com.lathief.NoteKeep.model.entities.UserNoteKey;
 import com.lathief.NoteKeep.model.entities.note.Label;
 import com.lathief.NoteKeep.model.entities.note.Note;
 import com.lathief.NoteKeep.model.entities.user.User;
 import com.lathief.NoteKeep.model.enums.EPermission;
-import com.lathief.NoteKeep.model.enums.ERole;
-import com.lathief.NoteKeep.repository.UserNoteRepository;
+import com.lathief.NoteKeep.repository.NoteUserRepository;
 import com.lathief.NoteKeep.repository.note.LabelRepository;
 import com.lathief.NoteKeep.repository.note.NoteRepository;
 import com.lathief.NoteKeep.service.interfaces.NoteService;
 import com.lathief.NoteKeep.service.provider.UserRelatedServiceImpl;
 import com.lathief.NoteKeep.utils.Response;
-import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,13 +24,13 @@ public class NoteServiceImpl extends UserRelatedServiceImpl implements NoteServi
     @Autowired
     LabelRepository labelRepository;
     @Autowired
-    UserNoteRepository userNoteRepository;
+    NoteUserRepository noteUserRepository;
     @Autowired
     Response response;
     public List<Note> getAllNotes() {
         User owner = getUserByUsername();
         List<Note> notes = new ArrayList<>();
-        List<UserNote> userNotes = userNoteRepository.findOneUserById(owner.getId());
+        List<UserNote> userNotes = noteUserRepository.findOneUserById(owner.getId());
         for (UserNote unote : userNotes) {
             notes.add(unote.getNote());
         }
@@ -43,7 +40,7 @@ public class NoteServiceImpl extends UserRelatedServiceImpl implements NoteServi
     public Note getNoteById(Long id) {
         User owner = getUserByUsername();
         List<Note> notes = new ArrayList<>();
-        List<UserNote> userNotes = userNoteRepository.findOneUserById(owner.getId());
+        List<UserNote> userNotes = noteUserRepository.findOneUserById(owner.getId());
         for (UserNote unote : userNotes) {
             if (unote.getNote().getId().equals(id)) {
                 return unote.getNote();
@@ -53,23 +50,16 @@ public class NoteServiceImpl extends UserRelatedServiceImpl implements NoteServi
     }
 
     public Map insertNote(Note note) {
-        Label label = labelRepository.findOneByName("unlabeled");
-        Set<Label> labels = new HashSet<>();
-        labels.add(label);
-        note.setLabels(labels);
-        UserNoteKey key = new UserNoteKey();
-        key.setNoteId(note.getId());
-        key.setUserId(getUserByUsername().getId());
         UserNote userNote = new UserNote(note, getUserByUsername(), EPermission.OWNER);
         noteRepository.save(note);
-        userNoteRepository.save(userNote);
+        noteUserRepository.save(userNote);
         return response.custom("Note di save", HttpStatus.CREATED);
     }
 
     public Map updateNote(Long id, Note note) {
         User owner = getUserByUsername();
         List<Note> notes = new ArrayList<>();
-        List<UserNote> userNotes = userNoteRepository.findOneUserById(owner.getId());
+        List<UserNote> userNotes = noteUserRepository.findOneUserById(owner.getId());
         for (UserNote unote : userNotes) {
             if (unote.getNote().getId().equals(id)) {
                 if (unote.getPermission().equals(EPermission.OWNER) || unote.getPermission().equals(EPermission.READ_WRITE)){
@@ -88,10 +78,10 @@ public class NoteServiceImpl extends UserRelatedServiceImpl implements NoteServi
             User owner = getUserByUsername();
             Note getNote = noteRepository.findOneById(id);
             if (getNote != null) {
-                List<UserNote> userNotes = userNoteRepository.findOneNoteById(id);
+                List<UserNote> userNotes = noteUserRepository.findOneNoteById(id);
                 for (UserNote userNote : userNotes) {
                     if (userNote.getPermission() == EPermission.OWNER && userNote.getUser().getId().equals(owner.getId())) {
-                        userNoteRepository.deleteOneNoteById(getNote.getId());
+                        noteUserRepository.deleteOneNoteById(getNote.getId());
                         noteRepository.deleteOneNoteById(id);
                         return response.custom("Note di delete", HttpStatus.OK);
                     }

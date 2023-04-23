@@ -30,7 +30,6 @@ public class JwtUtils {
         Map<String, Object> tokenData = new HashMap<String, Object>();
         tokenData.put("sub",userPrincipal.getUsername());
         tokenData.put("scope", userPrincipal.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
-        System.out.println(userPrincipal.toString());
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
                 .setClaims(tokenData)

@@ -1,12 +1,11 @@
 package com.lathief.NoteKeep.service;
 
 import com.lathief.NoteKeep.model.entities.UserNote;
-import com.lathief.NoteKeep.model.entities.UserNoteKey;
 import com.lathief.NoteKeep.model.entities.note.Label;
 import com.lathief.NoteKeep.model.entities.note.Note;
 import com.lathief.NoteKeep.model.entities.user.User;
 import com.lathief.NoteKeep.model.enums.EPermission;
-import com.lathief.NoteKeep.repository.UserNoteRepository;
+import com.lathief.NoteKeep.repository.NoteUserRepository;
 import com.lathief.NoteKeep.repository.note.LabelRepository;
 import com.lathief.NoteKeep.repository.note.NoteRepository;
 import com.lathief.NoteKeep.service.interfaces.NoteLabelService;
@@ -14,7 +13,6 @@ import com.lathief.NoteKeep.service.provider.UserRelatedServiceImpl;
 import com.lathief.NoteKeep.utils.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -28,14 +26,14 @@ public class NoteLabelServiceImpl extends UserRelatedServiceImpl implements Note
     @Autowired
     LabelRepository labelRepository;
     @Autowired
-    UserNoteRepository userNoteRepository;
+    NoteUserRepository noteUserRepository;
     public Map addLabel(Long noteid, List<String> labels) {
         User owner = getUserByUsername();
         Set<Label> savelabels = new HashSet<>();
 
         if (noteRepository.existsById(noteid)) {
             Note getNote = noteRepository.findOneById(noteid);
-            List<UserNote> userNote = userNoteRepository.findOneNoteById(noteid);
+            List<UserNote> userNote = noteUserRepository.findOneNoteById(noteid);
             for (UserNote unote : userNote) {
                 if (unote.getNote().getId().equals(noteid)) {
                     if (unote.getPermission().equals(EPermission.OWNER) && unote.getUser().getId().equals(getUserByUsername().getId())){
@@ -52,6 +50,29 @@ public class NoteLabelServiceImpl extends UserRelatedServiceImpl implements Note
                         getNote.setLabels(savelabels);
                         noteRepository.save(getNote);
                         return response.custom("Note ditambahkan Label", HttpStatus.OK);
+                    } else {
+                        return response.custom("Unauthorized to set label", HttpStatus.OK);
+                    }
+                }
+            }
+        }
+        return response.custom("Note Tidak ada", HttpStatus.NOT_FOUND);
+    }
+
+    public Map getLabel(Long noteid) {
+        List<Label> getLabels = new ArrayList<>();
+        if (noteRepository.existsById(noteid)) {
+            Note getNote = noteRepository.findOneById(noteid);
+            List<UserNote> userNote = noteUserRepository.findOneNoteById(noteid);
+            for (UserNote unote : userNote) {
+                if (unote.getNote().getId().equals(noteid)) {
+                    if (unote.getUser().getId().equals(getUserByUsername().getId())){
+                        List<Long> labelIds = labelRepository.getAllLabelByNoteId(noteid);
+                        System.out.println(labelIds);
+                        for (Long id: labelIds) {
+                            getLabels = labelRepository.findAllById(labelIds);
+                        }
+                        return response.success(getLabels);
                     } else {
                         return response.custom("Unauthorized to set label", HttpStatus.OK);
                     }

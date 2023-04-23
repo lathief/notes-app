@@ -7,6 +7,6 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class AddLabel {
+public class inputLabel {
     private List<String> labels;
 }
