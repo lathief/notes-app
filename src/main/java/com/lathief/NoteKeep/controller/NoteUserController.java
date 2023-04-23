@@ -23,6 +23,16 @@ public class NoteUserController {
     NoteUserService noteUserService;
     @Autowired
     Response response;
+    @Operation(summary = "Get all users who can access this note", tags = {"Notes Management"})
+    @GetMapping("/{noteid}/access")
+    public ResponseEntity<?> getUserAccess(@PathVariable Long noteid){
+        Map result = noteUserService.getUserAccess(noteid);
+        if (result != null) {
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(response.custom("Unauthorized", HttpStatus.NOT_FOUND), HttpStatus.NOT_FOUND);
+        }
+    }
     @Operation(summary = "Share note to another user with different permission", tags = {"Notes Management"})
     @PostMapping("/{noteid}/share")
     public ResponseEntity<?> shareNote(@PathVariable Long noteid, @Valid @RequestBody List<ShareNoteRequest> shareNoteRequests){
@@ -31,16 +41,6 @@ public class NoteUserController {
             result = noteUserService.shareNote(noteid, shareNoteRequest.getEmail(), shareNoteRequest.getPermission());
         }
 
-        if (result != null) {
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(response.custom("Unauthorized", HttpStatus.NOT_FOUND), HttpStatus.NOT_FOUND);
-        }
-    }
-    @Operation(summary = "Get all users who can access this note", tags = {"Notes Management"})
-    @GetMapping("/{noteid}/access")
-    public ResponseEntity<?> getUserAccess(@PathVariable Long noteid){
-        Map result = noteUserService.getUserAccess(noteid);
         if (result != null) {
             return new ResponseEntity<>(result, HttpStatus.OK);
         } else {

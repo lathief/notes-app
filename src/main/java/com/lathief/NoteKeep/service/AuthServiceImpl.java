@@ -65,24 +65,13 @@ public class AuthServiceImpl implements AuthService {
                 signupRequest.getEmail(),
                 encoder.encode(signupRequest.getPassword()));
 
-        Set<String> strRoles = signupRequest.getRole();
+        Set<String> strRoles = null;
         Set<Role> roles = new HashSet<>();
-
-        if (strRoles == null) {
-            Role userRole = roleRepository.findOneRoleByName(String.valueOf(ERole.ROLE_USER));
-            if (userRole == null) {
-                throw new RuntimeException("Error: Role " + ERole.ROLE_USER + " is not found");
-            }
-            roles.add(userRole);
-        } else {
-            strRoles.forEach(role -> {
-                Role userRole = roleRepository.findOneRoleByName(role);
-                if (userRole == null) {
-                    throw new RuntimeException("Error: Role " + role + " is not found");
-                }
-                roles.add(userRole);
-            });
+        Role userRole = roleRepository.findOneRoleByName(String.valueOf(ERole.ROLE_USER));
+        if (userRole == null) {
+            throw new RuntimeException("Error: Role " + ERole.ROLE_USER + " is not found");
         }
+        roles.add(userRole);
 
         user.setRoles(roles);
         userRepository.save(user);

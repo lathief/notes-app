@@ -18,5 +18,4 @@ public class SignupRequest {
     @NotEmpty(message = "password is required.")
     @Size(min = 6, message = "input is too short, please make sure at least 6 characters")
     private String password;
-    private Set<String> role;
 }

@@ -38,7 +38,7 @@ public class NoteController {
     }
     @Operation(summary = "Create note owned by the user", tags = {"Notes Management"})
     @PostMapping
-    public ResponseEntity<?> postNote(@RequestBody Note note){
+    public ResponseEntity<?> createNote(@RequestBody Note note){
         return new ResponseEntity<>(noteService.insertNote(note), HttpStatus.CREATED);
     }
     @Operation(summary = "Update note based on the id owned by the user", tags = {"Notes Management"})

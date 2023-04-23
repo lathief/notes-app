@@ -1,17 +1,15 @@
 package com.lathief.NoteKeep.model.payload.request;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 
 import lombok.Data;
 
 
 @Data
 public class SigninRequest {
-    @NotNull
-    @NotBlank
+    @NotEmpty(message = "Username is required.")
     private String username;
-    @NotNull
-    @NotBlank
+    @NotEmpty(message = "password is required.")
+    @Size(min = 6, message = "input is too short, please make sure at least 6 characters")
     private String password;
 }

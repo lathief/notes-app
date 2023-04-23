@@ -31,7 +31,7 @@ public class AuthController {
     @Autowired
     AuthService authService;
 
-    @Operation(summary = "Login User with username/email and password", tags = {"User Management"})
+    @Operation(summary = "Login User with username and password", tags = {"User Management"})
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody SigninRequest signinRequest) {
         return ResponseEntity.ok(authService.login(signinRequest));
