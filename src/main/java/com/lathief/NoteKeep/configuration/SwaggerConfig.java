@@ -15,7 +15,7 @@ public class SwaggerConfig {
     private int serverPort;
 
     @Bean
-    public OpenAPI userServiceApi(@Value("Swagger UI for NoteKeep App") String appDescription,
+    public OpenAPI NoteApi(@Value("Swagger UI for NoteKeep App") String appDescription,
                                   @Value("v1.0.0") String appVersion
     ) {
         Server server = new Server();

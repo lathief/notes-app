@@ -1,7 +1,6 @@
 package com.lathief.NoteKeep.service;
 
 import com.lathief.NoteKeep.model.entities.UserNote;
-import com.lathief.NoteKeep.model.entities.note.Label;
 import com.lathief.NoteKeep.model.entities.note.Note;
 import com.lathief.NoteKeep.model.entities.user.User;
 import com.lathief.NoteKeep.model.enums.EPermission;
@@ -10,6 +9,7 @@ import com.lathief.NoteKeep.repository.note.LabelRepository;
 import com.lathief.NoteKeep.repository.note.NoteRepository;
 import com.lathief.NoteKeep.service.interfaces.NoteService;
 import com.lathief.NoteKeep.service.provider.UserRelatedServiceImpl;
+import com.lathief.NoteKeep.utils.Encryption;
 import com.lathief.NoteKeep.utils.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,17 +22,22 @@ public class NoteServiceImpl extends UserRelatedServiceImpl implements NoteServi
     @Autowired
     NoteRepository noteRepository;
     @Autowired
-    LabelRepository labelRepository;
-    @Autowired
     NoteUserRepository noteUserRepository;
     @Autowired
     Response response;
+    @Autowired
+    Encryption encryption;
+    final String secretKey = "ssshhhhhhhhhhh!!!!";
+
     public List<Note> getAllNotes() {
         User owner = getUserByUsername();
         List<Note> notes = new ArrayList<>();
         List<UserNote> userNotes = noteUserRepository.findOneUserById(owner.getId());
         for (UserNote unote : userNotes) {
-            notes.add(unote.getNote());
+            Note getNote = new Note(unote.getId(), encryption.decrypt(unote.getNote().getTitle(), secretKey), encryption.decrypt(unote.getNote().getContent(), secretKey), unote.getNote().getLabels());
+            getNote.setCreatedAt(unote.getNote().getCreatedAt());
+            getNote.setUpdatedAt(unote.getNote().getUpdatedAt());
+            notes.add(getNote);
         }
         return notes;
     }
@@ -43,15 +48,19 @@ public class NoteServiceImpl extends UserRelatedServiceImpl implements NoteServi
         List<UserNote> userNotes = noteUserRepository.findOneUserById(owner.getId());
         for (UserNote unote : userNotes) {
             if (unote.getNote().getId().equals(id)) {
-                return unote.getNote();
+                Note getNote = new Note(unote.getId(), encryption.decrypt(unote.getNote().getTitle(), secretKey), encryption.decrypt(unote.getNote().getContent(), secretKey), unote.getNote().getLabels());
+                getNote.setCreatedAt(unote.getNote().getCreatedAt());
+                getNote.setUpdatedAt(unote.getNote().getUpdatedAt());
+                return getNote;
             }
         }
         return null;
     }
 
     public Map insertNote(Note note) {
-        UserNote userNote = new UserNote(note, getUserByUsername(), EPermission.OWNER);
-        noteRepository.save(note);
+        Note saveNote = new Note(encryption.encrypt(note.getTitle(), secretKey), encryption.encrypt(note.getContent(), secretKey));
+        UserNote userNote = new UserNote(saveNote, getUserByUsername(), EPermission.OWNER);
+        noteRepository.save(saveNote);
         noteUserRepository.save(userNote);
         return response.custom("Note di save", HttpStatus.CREATED);
     }
@@ -63,7 +72,7 @@ public class NoteServiceImpl extends UserRelatedServiceImpl implements NoteServi
         for (UserNote unote : userNotes) {
             if (unote.getNote().getId().equals(id)) {
                 if (unote.getPermission().equals(EPermission.OWNER) || unote.getPermission().equals(EPermission.READ_WRITE)){
-                    noteRepository.updateNote(id, note.getTitle(), note.getContent(), new Date());
+                    noteRepository.updateNote(id, encryption.encrypt(note.getTitle(), secretKey), encryption.encrypt(note.getContent(), secretKey), new Date());
                     return response.custom("Note di update", HttpStatus.OK);
                 } else {
                     return response.custom("Unauthorized to update note", HttpStatus.OK);

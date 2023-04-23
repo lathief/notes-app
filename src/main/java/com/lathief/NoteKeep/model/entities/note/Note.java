@@ -1,6 +1,7 @@
 package com.lathief.NoteKeep.model.entities.note;
 
 import com.lathief.NoteKeep.model.audit.DateAudit;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import java.util.Set;
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "notes")
 public class Note extends DateAudit {
     @Id

@@ -13,10 +13,6 @@ import java.util.List;
 
 @Repository
 public interface LabelRepository extends JpaRepository<Label, Long> {
-    @Query(value = "UPDATE labels SET updated_at=?4, name=?2 WHERE id=?1" , nativeQuery = true)
-    @Transactional
-    @Modifying
-    void updateNote(Long id, Date updated_at, String name);
     @Query(value = "SELECT * FROM labels WHERE name=?1", nativeQuery = true)
     Label findOneByName(String name);
     @Query(value = "SELECT label_id FROM note_label WHERE note_id=?1", nativeQuery = true)

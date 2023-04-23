@@ -30,69 +30,15 @@ import java.util.Set;
 public class AuthController {
     @Autowired
     AuthService authService;
-    @Autowired
-    AuthenticationManager authenticationManager;
-    @Autowired
-    JwtUtils jwtUtils;
-    @Autowired
-    Response response;
-    @Autowired
-    PasswordEncoder encoder;
+
     @Operation(summary = "Login User with username/email and password", tags = {"User Management"})
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody SigninRequest signinRequest) {
-        User getUser = authService.getUserByUsername(signinRequest.getUsername());
-        if (getUser == null){
-            return ResponseEntity.notFound().build();
-        }
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(signinRequest.getUsername(), signinRequest.getPassword()));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        String accessToken = jwtUtils.generateJwtAccessToken(authentication);
-
-        User userDetails = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(new JWTResponse(accessToken));
+        return ResponseEntity.ok(authService.login(signinRequest));
     }
     @Operation(summary = "Register User with username, email and password", tags = {"User Management"})
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
-        if (authService.checkExistUserByUsername(signupRequest.getUsername()) != null){
-            return ResponseEntity
-                    .badRequest()
-                    .body(response.badRequest("Error: Username is already taken!"));
-        }
-        if (authService.checkExistUserByEmail(signupRequest.getEmail()) != null) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(response.badRequest("Error: Email is already in use!"));
-        }
-
-        User user = new User(signupRequest.getUsername(),
-                signupRequest.getEmail(),
-                encoder.encode(signupRequest.getPassword()));
-
-        Set<String> strRoles = signupRequest.getRole();
-        Set<Role> roles = new HashSet<>();
-
-        if (strRoles == null) {
-            Role userRole = authService.getRole(String.valueOf(ERole.ROLE_USER));
-            if (userRole == null) {
-                throw new RuntimeException("Error: Role " + ERole.ROLE_USER + " is not found");
-            }
-            roles.add(userRole);
-        } else {
-            strRoles.forEach(role -> {
-                Role userRole = authService.getRole(role);
-                if (userRole == null) {
-                    throw new RuntimeException("Error: Role " + role + " is not found");
-                }
-                roles.add(userRole);
-            });
-        }
-
-        user.setRoles(roles);
-        return ResponseEntity.ok(authService.register(user));
+        return ResponseEntity.ok(authService.register(signupRequest));
     }
 }
